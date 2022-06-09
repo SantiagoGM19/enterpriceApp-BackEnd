@@ -1,10 +1,7 @@
 package com.sofkau.enterpriseAppBackEnd.routes;
 
 import com.sofkau.enterpriseAppBackEnd.dto.ProductDTO;
-import com.sofkau.enterpriseAppBackEnd.usecases.ProductUseCases.GetAllProductsUseCase;
-import com.sofkau.enterpriseAppBackEnd.usecases.ProductUseCases.GetProductByIdUseCase;
-import com.sofkau.enterpriseAppBackEnd.usecases.ProductUseCases.SaveProductUseCase;
-import com.sofkau.enterpriseAppBackEnd.usecases.ProductUseCases.UpdateProductUseCase;
+import com.sofkau.enterpriseAppBackEnd.usecases.ProductUseCases.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -15,6 +12,8 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.NoSuchElementException;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -64,9 +63,21 @@ public class ProductRouter {
                         ? ServerResponse.status(HttpStatus.CREATED)
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(result)
-                                        :ServerResponse.status(HttpStatus.NOT_FOUND)
+                                :ServerResponse.status(HttpStatus.NOT_FOUND)
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(result))
+        );
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> deleteProductRouter(DeleteProductUseCase deleteProductUseCase){
+        return route(DELETE("/products/{id}").and(accept(MediaType.APPLICATION_JSON)),
+                request -> deleteProductUseCase.apply(request.pathVariable("id"))
+                        .onErrorResume(r -> Mono.empty())
+                        .flatMap(productDTO -> ServerResponse.status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(productDTO))
+
         );
     }
 }
