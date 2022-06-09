@@ -28,7 +28,7 @@ public class ProductRouter {
                 request -> request.bodyToMono(ProductDTO.class)
                         .flatMap(productDTO -> saveProductUseCase.apply(productDTO))
                         .flatMap(result ->
-                                ServerResponse.ok()
+                                ServerResponse.status(HttpStatus.CREATED)
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(result))
         );
@@ -37,7 +37,7 @@ public class ProductRouter {
     @Bean
     public RouterFunction<ServerResponse> getAllProductsRouter(GetAllProductsUseCase getAllProductsUseCase){
         return route(GET("/products"),
-                request -> ServerResponse.ok()
+                request -> ServerResponse.status(HttpStatus.FOUND)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromPublisher(getAllProductsUseCase.get(), ProductDTO.class))
                 );
@@ -48,10 +48,25 @@ public class ProductRouter {
         return route(GET("/products/{id}"),
                 request -> getProductByIdUseCase.apply(request.pathVariable("id"))
                         .onErrorResume(r -> Mono.empty())
-                        .flatMap(productDTO -> ServerResponse.ok()
+                        .flatMap(productDTO -> ServerResponse.status(HttpStatus.FOUND)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(productDTO))
                         .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_FOUND).build())
                 );
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> updateProductRouter(UpdateProductUseCase updateProductUseCase){
+        return route(PUT("/products/{id}").and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(ProductDTO.class)
+                        .flatMap(productDTO -> updateProductUseCase.apply(request.pathVariable("id"), productDTO))
+                        .flatMap(result -> result.getName()!=null
+                        ? ServerResponse.status(HttpStatus.CREATED)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(result)
+                                        :ServerResponse.status(HttpStatus.NOT_FOUND)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(result))
+        );
     }
 }
