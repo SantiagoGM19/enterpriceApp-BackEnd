@@ -3,9 +3,8 @@ package com.sofkau.enterpriseAppBackEnd.usecases.ProductUseCases;
 import com.sofkau.enterpriseAppBackEnd.dto.ProductDTO;
 import com.sofkau.enterpriseAppBackEnd.mapper.ProductMapper;
 import com.sofkau.enterpriseAppBackEnd.repository.IProductRepository;
-import com.sofkau.enterpriseAppBackEnd.usecases.Interfaces.SaveProduct;
+import com.sofkau.enterpriseAppBackEnd.usecases.Interfaces.ProductInterfaces.SaveProduct;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
