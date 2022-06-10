@@ -6,14 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.NoSuchElementException;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -72,11 +68,9 @@ public class ProductRouter {
     @Bean
     public RouterFunction<ServerResponse> deleteProductRouter(DeleteProductUseCase deleteProductUseCase){
         return route(DELETE("/products/{id}").and(accept(MediaType.APPLICATION_JSON)),
-                request -> deleteProductUseCase.apply(request.pathVariable("id"))
-                        .onErrorResume(r -> Mono.empty())
-                        .flatMap(productDTO -> ServerResponse.status(HttpStatus.OK)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(productDTO))
+                request -> ServerResponse.status(HttpStatus.OK)
+                        .body(BodyInserters.fromPublisher(deleteProductUseCase.apply(request.pathVariable("id"))
+                                ,Void.class))
 
         );
     }
