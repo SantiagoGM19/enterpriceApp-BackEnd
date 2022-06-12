@@ -19,7 +19,6 @@ public class DeleteProductUseCase implements DeleteProduct {
     public Mono<Void> apply(String id) {
 
         return productRepository.findById(id)
-                .flatMap(product -> productRepository.deleteById(id))
-                .switchIfEmpty(Mono.error(new NoSuchElementException()));
+                .flatMap(product -> productRepository.deleteById(id));
     }
 }

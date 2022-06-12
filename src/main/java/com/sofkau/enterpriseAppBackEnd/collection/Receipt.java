@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Document(collection = "receipt")
@@ -12,6 +13,7 @@ public class Receipt {
     @Id
     private String receiptId;
     private String name;
-    private List<Product> productsReceived;
+    private List<Product> receivedProducts;
     private String providerId;
+    private LocalDate date;
 }

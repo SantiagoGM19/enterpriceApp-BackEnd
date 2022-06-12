@@ -18,7 +18,6 @@ public class DeleteProviderUseCase implements DeleteProvider {
     @Override
     public Mono<Void> apply(String id) {
         return providerRepository.findById(id)
-                .flatMap(provider -> providerRepository.deleteById(id))
-                .switchIfEmpty(Mono.error(new NoSuchElementException()));
+                .flatMap(provider -> providerRepository.deleteById(id));
     }
 }

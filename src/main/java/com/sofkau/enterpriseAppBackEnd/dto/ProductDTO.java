@@ -14,5 +14,5 @@ public class ProductDTO {
     private Integer maximum;
     private Integer stock;
     private Double price;
-    private Provider provider;
+    private ProviderDTO provider;
 }
